@@ -2,7 +2,7 @@
 
 require_once __DIR__.'/../vendor/autoload.php';
 
-// Dotenv::load(__DIR__.'/../');
+Dotenv::load(__DIR__.'/../');
 
 /*
 |--------------------------------------------------------------------------
@@ -19,9 +19,11 @@ $app = new Laravel\Lumen\Application(
     realpath(__DIR__.'/../')
 );
 
-// $app->withFacades();
+$app->configure('oauth2');
 
-// $app->withEloquent();
+$app->withFacades();
+
+$app->withEloquent();
 
 /*
 |--------------------------------------------------------------------------
@@ -55,17 +57,20 @@ $app->singleton(
 |
 */
 
-// $app->middleware([
-//     // Illuminate\Cookie\Middleware\EncryptCookies::class,
-//     // Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
-//     // Illuminate\Session\Middleware\StartSession::class,
-//     // Illuminate\View\Middleware\ShareErrorsFromSession::class,
-//     // Laravel\Lumen\Http\Middleware\VerifyCsrfToken::class,
-// ]);
+$app->middleware([
+    // Illuminate\Cookie\Middleware\EncryptCookies::class,
+    // Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+    // Illuminate\Session\Middleware\StartSession::class,
+    // Illuminate\View\Middleware\ShareErrorsFromSession::class,
+    Laravel\Lumen\Http\Middleware\VerifyCsrfToken::class,
+	\LucaDegasperi\OAuth2Server\Middleware\OAuthExceptionHandlerMiddleware::class,
+]);
 
-// $app->routeMiddleware([
-
-// ]);
+$app->routeMiddleware([
+	'check-authorization-params' => \LucaDegasperi\OAuth2Server\Middleware\CheckAuthCodeRequestMiddleware::class,
+    'oauth' => \LucaDegasperi\OAuth2Server\Middleware\OAuthMiddleware::class,
+    'oauth-owner' => \LucaDegasperi\OAuth2Server\Middleware\OAuthOwnerMiddleware::class,
+]);
 
 /*
 |--------------------------------------------------------------------------
@@ -80,6 +85,10 @@ $app->singleton(
 
 // $app->register(App\Providers\AppServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
+
+// Register oauth2-server-laravel/wiki/Lumen-Installation package 
+$app->register(\LucaDegasperi\OAuth2Server\Storage\FluentStorageServiceProvider::class);
+$app->register(\LucaDegasperi\OAuth2Server\OAuth2ServerServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------
