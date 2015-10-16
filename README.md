@@ -1,6 +1,6 @@
-# TatuQ API Server
+# Lumen API Server Example
 
-文身圈是文身领域的工具社交 APP
+A simple and fast lumen API backend example program.
 
 ***
 
@@ -17,7 +17,7 @@
 
 ## API Documents [Swagger](http://swagger.io/)
 
-Link：http://api.tatuq.com/docs
+DEMO Link：http://test.api.tatuq.com/docs
 
 ## Developer
 
