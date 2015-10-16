@@ -14,8 +14,7 @@
 $factory->define(App\User::class, function ($faker) {
     return [
         'name' => $faker->name,
-        'email' => $faker->email,
+        'phone' => $faker->phoneNumber,
         'password' => str_random(10),
-        'remember_token' => str_random(10),
     ];
 });

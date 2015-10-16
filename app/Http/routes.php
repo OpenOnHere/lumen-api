@@ -2,8 +2,7 @@
 
 // Welcome Page
 $app->get('/', function () {
-	return "<h1>TatuQ API Server.</h1>
-	<br >Documents is <a href=".env('API_DOC_URL').">".env('API_DOC_URL')."</a>";
+	return ['name' => 'TatuQ API Server.', 'doc_url' => env('API_DOC_URL')];
 });
 
 // API Documents

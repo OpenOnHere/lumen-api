@@ -83,12 +83,55 @@ $app->routeMiddleware([
 |
 */
 
-// $app->register(App\Providers\AppServiceProvider::class);
+$app->register(App\Providers\AppServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
 
-// Register oauth2-server-laravel/wiki/Lumen-Installation package 
+// Register oauth2-server-laravel package 
 $app->register(\LucaDegasperi\OAuth2Server\Storage\FluentStorageServiceProvider::class);
 $app->register(\LucaDegasperi\OAuth2Server\OAuth2ServerServiceProvider::class);
+// Register dingo/api package
+$app->register(Dingo\Api\Provider\LumenServiceProvider::class);
+
+// Dingo Response Transformer
+$app['Dingo\Api\Transformer\Factory']->setAdapter(function ($app) {
+    $fractal = new League\Fractal\Manager;
+
+    $fractal->setSerializer(new League\Fractal\Serializer\JsonApiSerializer);
+
+    return new Dingo\Api\Transformer\Adapter\Fractal($fractal);
+});
+
+// Dingo basic auth
+$app['Dingo\Api\Auth\Auth']->extend('basic', function ($app) {
+   return new Dingo\Api\Auth\Provider\Basic($app['auth'], 'phone');
+});
+
+// Dingo OAuth2.0 auth
+$app['Dingo\Api\Auth\Auth']->extend('oauth', function ($app) {
+   $provider = new Dingo\Api\Auth\Provider\OAuth2($app['oauth2-server.authorizer']->getChecker());
+
+    $provider->setUserResolver(function ($id) {
+        return App\User::findOrFail($id);
+    });
+
+    $provider->setClientResolver(function ($id) {
+        // TODO
+        // return OAuthClient::findOrFail($id);
+    });
+
+    return $provider;
+});
+
+// Dingo Error Format
+$app['Dingo\Api\Exception\Handler']->setErrorFormat([
+    'error' => [
+        'message' => ':message',
+        'errors' => ':errors',
+        'code' => ':code',
+        'status_code' => ':status_code',
+        'debug' => ':debug'
+    ]
+]);
 
 /*
 |--------------------------------------------------------------------------
@@ -103,6 +146,7 @@ $app->register(\LucaDegasperi\OAuth2Server\OAuth2ServerServiceProvider::class);
 
 $app->group(['namespace' => 'App\Http\Controllers'], function ($app) {
     require __DIR__.'/../app/Http/routes.php';
+    require __DIR__.'/../app/Api/routes.php';
 });
 
 return $app;

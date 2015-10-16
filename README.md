@@ -12,6 +12,12 @@
 
 ## Dependency Library
 
+* lucadegasperi/oauth2-server-laravel [GitHub](https://github.com/lucadegasperi/oauth2-server-laravel)
+* dingo/api [GitHub](https://github.com/dingo/api)
+
+## API Documents [Swagger](http://swagger.io/)
+
+Link：http://api.tatuq.com/docs
 
 ## Developer
 
