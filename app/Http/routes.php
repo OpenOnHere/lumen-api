@@ -1,39 +1,16 @@
 <?php
 
-$app->get('/', function () use ($app) {
-    return $app->welcome();
+// Welcome Page
+$app->get('/', function () {
+	return "<h1>TatuQ API Server.</h1>
+	<br >Documents is <a href=".env('API_DOC_URL').">".env('API_DOC_URL')."</a>";
 });
 
-$app->post('oauth/access_token', function() {
-    return Response::json(Authorizer::issueAccessToken());
-});
+// API Documents
+$app->get('docs', 'Controller@docs');
 
-$app->get('oauth/me', function() {
-	return LucaDegasperi\OAuth2Server\Facades\Authorizer::getResourceOwnerId();
-});
-
-$app->get('oauth/authorize', ['as' => 'oauth.authorize.get','middleware' => ['check-authorization-params', 'auth'], function() {
-    // display a form where the user can authorize the client to access it's data
-   $authParams = Authorizer::getAuthCodeRequestParams();
-   $formParams = array_except($authParams,'client');
-   $formParams['client_id'] = $authParams['client']->getId();
-   return View::make('oauth.authorization-form', ['params'=>$formParams,'client'=>$authParams['client']]);
-}]);
-
-$app->post('oauth/authorize', ['as' => 'oauth.authorize.post','middleware' => ['csrf', 'check-authorization-params', 'auth'], function() {
-
-    $params = Authorizer::getAuthCodeRequestParams();
-    $params['user_id'] = Auth::user()->id;
-    $redirectUri = '';
-
-    // if the user has allowed the client to access its data, redirect back to the client with an auth code
-    if (Input::get('approve') !== null) {
-        $redirectUri = Authorizer::issueAuthCode('user', $params['user_id'], $params);
-    }
-
-    // if the user has denied the client to access its data, redirect back to the client with an error message
-    if (Input::get('deny') !== null) {
-        $redirectUri = Authorizer::authCodeRequestDeniedRedirectUri();
-    }
-    return Redirect::to($redirectUri);
-}]);
+// OAuth2.0 Sever Routes
+$app->post('oauth/access_token', ['as' => 'oauth.access_token', 'uses' => 'OAuthController@issueAccessToken']);
+$app->get('oauth/me', ['as' => 'oauth.owner', 'uses' => 'OAuthController@owner']);
+$app->get('oauth/authorize', ['as' => 'oauth.authorize.get', 'uses' => 'OAuthController@authorize']);
+$app->post('oauth/authorize', ['as' => 'oauth.authorize.post', 'uses' => 'OAuthController@issueAuthorize']);
