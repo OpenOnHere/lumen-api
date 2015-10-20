@@ -1,7 +1,0 @@
----
-swagger: "2.0"
-info:
-  version: "1.0"
-  title: "TatuQ API Server "
-  description: "文身圈后台 API 接口文档"
-paths: {}

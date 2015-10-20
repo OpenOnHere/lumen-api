@@ -41,6 +41,8 @@ class CreateOauthClientEndpointsTable extends Migration
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
         });
+
+        $this->setupTestOAuthClientEndpoint();
     }
 
     /**
@@ -55,5 +57,15 @@ class CreateOauthClientEndpointsTable extends Migration
         });
 
         Schema::drop('oauth_client_endpoints');
+    }
+
+    private function setupTestOAuthClientEndpoint() 
+    {
+        DB::table('oauth_client_endpoints')->insert([
+            'client_id' => env('API_CLIENT_ID'),
+            'redirect_uri' => env('API_DOC_URL')."/api/ui/o2c.html",
+            'created_at' => Carbon\Carbon::now(),
+            'updated_at' => Carbon\Carbon::now()
+        ]);
     }
 }

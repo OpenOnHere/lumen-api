@@ -16,7 +16,7 @@ class OAuthController extends Controller
     {
         $this->middleware('auth', ['only' => ['authorize', 'issueAuthorize']]);
         $this->middleware('check-authorization-params', ['only' => ['authorize', 'issueAuthorize']]);
-        $this->middleware('csrf', ['only' => 'issueAuthorize']);
+        // $this->middleware('csrf', ['only' => 'issueAuthorize']);
     }
 
     /**
@@ -26,7 +26,7 @@ class OAuthController extends Controller
      */
     public function issueAccessToken()
     {
-        return Response::json(Authorizer::issueAccessToken());
+        return Authorizer::issueAccessToken();
     }
 
     /**

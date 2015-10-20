@@ -1,0 +1,110 @@
+---
+swagger: '2.0'
+info:
+  version: '0.1.1'
+  title: Lumen API Server
+  description: A short intro for lumen api server example
+  contact:
+    name: Jobs Long
+    email: jobslong@ideas.top
+    url: 'http://jobslong.com'
+  license:
+    name: MIT
+host: lumen-api.app
+basePath: /api
+schemes:
+  - http
+produces:
+	- application/json
+paths:
+  /oauth/access_token:
+    post:
+      summary: "OAuth 2.0 Flow"
+      description: |
+        用户通过授权，即可获取 access_token，暂时只支持 passord 授权类型
+      consumes:
+      	- application/x-www-form-urlencoded
+      parameters:
+        - name: grant_type
+          description: |
+            OAuth 2.0 授权方式
+          in: formData
+          required: true
+          type: string
+          format: string
+          default: "password"
+        - name: client_id
+          description: 认证客户端 ID
+          in: formData
+          required: true
+          type: string
+          format: string
+          default: "test_client_id"
+        - name: client_secret
+          description: 认证客户端密钥
+          in: formData
+          required: true
+          type: string
+          format: string
+          default: "test_client_secret"
+        - name: username
+          description: 用户登录账号（一般为邮箱或者手机号码）
+          in: formData
+          required: true
+          type: string
+          format: string
+          default: "test@test.cn"
+        - name: password
+          description: 用户密码
+          in: formData
+          required: true
+          type: string
+          format: string
+          default: "password"
+        - name: refresh_token
+          description: 刷新 token
+          in: formData
+          required: false
+          type: string
+          format: string
+      tags:
+        - OAuth
+      responses:
+        '200':
+          description: 获取 access_token 成功
+          schema:
+            $ref: '#/definitions/OAuth'
+          default:
+            description: Unexpected error
+            schema:
+              $ref: '#/definitions/Error'
+definitions:
+  OAuth:
+    type: object
+    properties:
+      access_token:
+        type: string
+        description: access token
+        default: "U12pSMtFbzj8LLwHAvgijaJCscH661DJkFzNQoBj"
+      token_type:
+        type: string
+        description: 默认为 Bearer
+        default: "Bearer"
+      expires_in:
+        type: integer
+        description: access token 过期时间
+        default: 3600
+      refresh_token:
+        type: string
+        description: refresh token
+        default: "t3Izt28gjURsrpKK2PsbHPc1is980JK2VRksYHce"
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      fields:
+        type: string                    

@@ -9,7 +9,7 @@ class PasswordGrantVerifier
 	public function verify($username, $password)
 	{
 		$credentials = [
-			'email'    => $username,
+			'phone'    => $username,
 			'password' => $password,
 		];
 

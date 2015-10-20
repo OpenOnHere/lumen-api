@@ -35,6 +35,8 @@ class CreateOauthClientsTable extends Migration
 
             $table->unique(['id', 'secret']);
         });
+
+        $this->setupTestOAuthClient();
     }
 
     /**
@@ -45,5 +47,16 @@ class CreateOauthClientsTable extends Migration
     public function down()
     {
         Schema::drop('oauth_clients');
+    }
+
+    public function setupTestOAuthClient() 
+    {
+        DB::table('oauth_clients')->insert([
+            'id' => env('API_CLIENT_ID'),
+            'secret' => env('API_CLIENT_SECRET'),
+            'name' => 'Test Client',
+            'created_at' => Carbon\Carbon::now(),
+            'updated_at' => Carbon\Carbon::now()
+        ]);
     }
 }
