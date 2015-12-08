@@ -1,9 +1,9 @@
 ---
 swagger: '2.0'
 info:
-  version: '0.1.1'
-  title: Lumen API Server
-  description: A short intro for lumen api server example
+  version: '1.0.0'
+  title: iWangNeng API Server
+  description: A useful documention for API
   contact:
     name: Jobs Long
     email: jobslong@ideas.top
@@ -17,43 +17,19 @@ schemes:
 produces:
 	- application/json
 paths:
-  /oauth/access_token:
+  /auth/login:
     post:
-      summary: "OAuth 2.0 Flow"
+      summary: "用户验证流程"
       description: |
-        用户通过授权，即可获取 access_token，暂时只支持 passord 授权类型
-      consumes:
-      	- application/x-www-form-urlencoded
+        用户验证流程：登录
       parameters:
-        - name: grant_type
-          description: |
-            OAuth 2.0 授权方式
+        - name: phone
+          description: 用户登录账号（手机号码）
           in: formData
           required: true
           type: string
           format: string
-          default: "password"
-        - name: client_id
-          description: 认证客户端 ID
-          in: formData
-          required: true
-          type: string
-          format: string
-          default: "test_client_id"
-        - name: client_secret
-          description: 认证客户端密钥
-          in: formData
-          required: true
-          type: string
-          format: string
-          default: "test_client_secret"
-        - name: username
-          description: 用户登录账号（一般为邮箱或者手机号码）
-          in: formData
-          required: true
-          type: string
-          format: string
-          default: "test@test.cn"
+          default: "1850022XXXX"
         - name: password
           description: 用户密码
           in: formData
@@ -61,43 +37,127 @@ paths:
           type: string
           format: string
           default: "password"
-        - name: refresh_token
-          description: 刷新 token
-          in: formData
-          required: false
-          type: string
-          format: string
       tags:
-        - OAuth
+        - Auth
       responses:
         '200':
-          description: 获取 access_token 成功
+          description: 获取 token 成功
           schema:
-            $ref: '#/definitions/OAuth'
+            $ref: '#/definitions/Auth'
+          default:
+            description: Unexpected error
+            schema:
+              $ref: '#/definitions/Error'
+  /auth/register:
+    post:
+      summary: "用户验证流程"
+      description: |
+        用户验证流程：注册, 需要经过手机验证码检测中间件
+      parameters:
+        - name: phone
+          description: 用户注册账号（手机号码）
+          in: formData
+          required: true
+          type: string
+          format: string
+          default: "1850022XXXX"
+        - name: code
+          description: 手机验证码(暂时为4位)
+          in: formData
+          required: true
+          type: string
+          description: "0457"
+        - name: password
+          description: 用户密码
+          in: formData
+          required: true
+          type: string
+          format: string
+          default: "password"
+  /auth/reset:
+    post:
+      summary: "用户验证流程"
+      description: |
+        用户验证流程：忘记密码, 需要经过手机验证码检测中间件
+      parameters:
+        - name: phone
+          description: 用户登录账号（手机号码）
+          in: formData
+          required: true
+          type: string
+          format: string
+          default: "1850022XXXX"
+        - name: code
+          description: 手机验证码(暂时为4位)
+          in: formData
+          required: true
+          type: string
+          description: "0457"
+        - name: password
+          description: 用户密码
+          in: formData
+          required: true
+          type: string
+          format: string
+          default: "password"
+      tags:
+        - Auth
+      responses:
+        '200':
+          description: 用户重置密码成功
+          schema:
+            $ref: '#/definitions/Success'
+          default:
+            description: Unexpected error
+            schema:
+              $ref: '#/definitions/Error'
+  /auth/me:
+    get:
+      summary: "用户验证流程"
+      description: |
+        用户验证流程：获得验证用户信息
+      tags:
+        - Auth
+      responses:
+        '200':
+          description: 获得验证用户信息
+          schema:
+            $ref: '#/definitions/User'
+          default:
+            description: Unexpected error
+            schema:
+              $ref: '#/definitions/Error'
+  /auth/valid_token:
+    get:
+      summary: "用户验证流程"
+      description: |
+        用户验证流程：验证 token 是否有效
+      tags:
+        - Auth
+      responses:
+        '200':
+          description: valid token
+          schema:
+            $ref: '#/definitions/Success'
           default:
             description: Unexpected error
             schema:
               $ref: '#/definitions/Error'
 definitions:
-  OAuth:
+  Auth:
     type: object
     properties:
-      access_token:
+      token:
         type: string
-        description: access token
+        description: jwt-auth token
         default: "U12pSMtFbzj8LLwHAvgijaJCscH661DJkFzNQoBj"
-      token_type:
+  User:
+    type: object
+    properties:
+      phone: 
         type: string
-        description: 默认为 Bearer
-        default: "Bearer"
-      expires_in:
-        type: integer
-        description: access token 过期时间
-        default: 3600
-      refresh_token:
-        type: string
-        description: refresh token
-        default: "t3Izt28gjURsrpKK2PsbHPc1is980JK2VRksYHce"
+        description: 用户登录账号（手机号码）
+        default: "1850022XXXX"
   Error:
     type: object
     properties:
@@ -107,4 +167,11 @@ definitions:
       message:
         type: string
       fields:
-        type: string                    
+        type: string   
+  Success:
+    type: object
+    properties:
+      status: 
+        type: string
+        description: success response
+        default: "success"

@@ -19,11 +19,13 @@ $app = new Laravel\Lumen\Application(
     realpath(__DIR__.'/../')
 );
 
-$app->configure('oauth2');
-
 $app->withFacades();
 
 $app->withEloquent();
+
+$app->configure('oauth2');
+
+$app->configure('jwt');
 
 /*
 |--------------------------------------------------------------------------
@@ -70,6 +72,8 @@ $app->routeMiddleware([
 	'check-authorization-params' => \LucaDegasperi\OAuth2Server\Middleware\CheckAuthCodeRequestMiddleware::class,
     'oauth' => \LucaDegasperi\OAuth2Server\Middleware\OAuthMiddleware::class,
     'oauth-owner' => \LucaDegasperi\OAuth2Server\Middleware\OAuthOwnerMiddleware::class,
+    'jwt.auth'    => \Tymon\JWTAuth\Middleware\GetUserFromToken::class,
+    'jwt.refresh' => \Tymon\JWTAuth\Middleware\RefreshToken::class,
 ]);
 
 /*
@@ -89,8 +93,16 @@ $app->register(App\Providers\AppServiceProvider::class);
 // Register oauth2-server-laravel package 
 $app->register(\LucaDegasperi\OAuth2Server\Storage\FluentStorageServiceProvider::class);
 $app->register(\LucaDegasperi\OAuth2Server\OAuth2ServerServiceProvider::class);
+// Register tymon/jwt-auth package
+$app->register(\Tymon\JWTAuth\Providers\JWTAuthServiceProvider::class);
 // Register dingo/api package
 $app->register(Dingo\Api\Provider\LumenServiceProvider::class);
+
+class_alias('Tymon\JWTAuth\Facades\JWTAuth', 'JWTAuth');  
+/** This gives you finer control over the payloads you create if you require it.
+ *  Source: https://github.com/tymondesigns/jwt-auth/wiki/Installation
+ */
+class_alias('Tymon\JWTAuth\Facades\JWTFactory', 'JWTFactory'); // Optional
 
 // Dingo Response Transformer
 $app['Dingo\Api\Transformer\Factory']->setAdapter(function ($app) {
@@ -120,6 +132,11 @@ $app['Dingo\Api\Auth\Auth']->extend('oauth', function ($app) {
     });
 
     return $provider;
+});
+
+// JWT OAuth
+app('Dingo\Api\Auth\Auth')->extend('jwt', function ($app) {
+   return new Dingo\Api\Auth\Provider\JWT($app['Tymon\JWTAuth\JWTAuth']);
 });
 
 // Dingo Error Format
